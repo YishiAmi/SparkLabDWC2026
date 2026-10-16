@@ -1,4 +1,4 @@
-# SparkPower – DataWorks Challenge 2026
+# SparkLab – DataWorks Challenge 2026
 **Machine-learning-assisted history matching and production forecasting** (ExxonMobil DWC26)
 
 ## What this does
@@ -9,32 +9,37 @@
 3. **Forecast** – `src/decline.py` + `src/forecast_run.py`. The 10 best, diverse parameter sets are extrapolated from 2008 to 01/01/2028
    (oil: mean of exponential & hyperbolic decline; gas: gas-oil-ratio trend; water: ln(WOR) vs cumulative oil) and written into the official template.
 
+## Data is NOT included
+The datasets and starter kit are provided exclusively for the DataWorks Challenge 2026 and must not be published, so this repository contains **code only**.
+To reproduce, download the starter kit from the challenge web app and unzip it so that you have a folder containing `TestCases/`.
+
 ## Folder layout
 | Folder | Contents |
 |---|---|
 | `src/` | all code (see run order) |
-| `data/` | `prod.pkl`, `unc.pkl` (extracted from the organisers' Excel files), `data.npz` (model-ready arrays), official template `09 Template Deliverable.xlsx` (updated version, forecast to 01/01/2028) |
-| `models/` | `proxy_final.pkl` – trained proxy model (trained on all 100 cases) |
-| `outputs/` | **`09 Template Deliverable - Filled.xlsx`** (the forecast submission), `PowerBI_Data.xlsx` (dashboard source), `model_comparison.json`, `selected.npz`, `fc20.npz`, `forecast_overview.png`, `grid_summary.csv` |
+| `data/` | (empty) created files go here: `prod.pkl`, `unc.pkl`, `data.npz`; **you copy the official `09 Template Deliverable.xlsx` here** |
+| `models/` | (empty) trained proxy model is written here |
+| `outputs/` | (empty) filled template, Power BI data, model comparison, plots are written here |
 | `docs/` | `model_comparison.md` |
 
 ## How to run (Python 3.10+, `pip install -r requirements.txt`)
-Everything uses paths relative to this folder; run from anywhere.
 ```
-python src/prep.py            # data/prod.pkl + unc.pkl -> data/data.npz        (seconds)
-python src/proxy.py           # optional: validation report of the proxy        (~1 min)
-python src/hm.py              # history matching -> models/proxy_final.pkl      (~15 s)
-python src/forecast_run.py    # 10 best cases -> 80-quarter forecast -> filled template
+export DWC_RAW=/path/to/starter_kit           # folder that contains TestCases/   (Windows: set DWC_RAW=...)
+cp "$DWC_RAW/TestCases/09 Template Deliverable.xlsx" data/
+python src/00_extract.py      # TestCases/01, 02 -> data/prod.pkl, unc.pkl
+python src/prep.py            # -> data/data.npz
+python src/proxy.py           # optional: validation report of the proxy (~1 min)
+python src/hm.py              # history matching -> models/proxy_final.pkl (~15 s)
+python src/forecast_run.py    # 10 best cases -> 80-quarter forecast -> outputs/09 Template Deliverable - Filled.xlsx
 python src/compare_models.py  # optional: GP vs ridge / MLP / random forest / gradient boosting
-python src/build_powerbi.py   # PowerBI_Data.xlsx
-python src/make_plot.py       # forecast_overview.png
+python src/build_powerbi.py   # outputs/PowerBI_Data.xlsx
+python src/make_plot.py       # outputs/forecast_overview.png
 ```
-Optional, needs the organisers' Excel files (set `DWC_RAW` to the folder that contains `TestCases/`):
+Optional grid analysis (grid files 03-08):
 ```
-python src/00_extract.py      # Excel (01, 02) -> data/prod.pkl, unc.pkl
-python src/extract_grid.py    # grid files 03-08 -> data/grid/case_NNN.npz   (~10 min, ~1 GB)
-python src/grid_summary.py    # per-case grid summaries -> outputs/grid_summary.csv
-python src/grid_vary.py / grid_vary2.py / grid_vary3.py   # which grid columns/cells differ between cases
+python src/extract_grid.py    # -> data/grid/case_NNN.npz   (~10 min, ~1 GB)
+python src/grid_summary.py    # -> outputs/grid_summary.csv
+python src/grid_vary.py ; python src/grid_vary2.py ; python src/grid_vary3.py
 ```
 
 ## Results
